@@ -10,7 +10,7 @@ pipeline {
     stage('K8S Manifest Update') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'jitoo', passwordVariable: 'password', usernameVariable: 'username')]) {
-          sh 'touch 1.1 && echo "v2" >> ./1.1'
+          sh 'touch 1.1 && echo "v2." >> ./1.1'
           sh 'git init'
           sh 'git add .'
           sh 'git config --global user.email "jjs_0719@naver.com"'
