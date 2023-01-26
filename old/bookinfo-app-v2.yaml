@@ -52,7 +52,7 @@ spec:
           runAsUser: 1000
 ---
 ##################################################################################################
-# Ratings service-a
+# Ratings service-1
 ##################################################################################################
 apiVersion: v1
 kind: Service
@@ -225,6 +225,53 @@ spec:
       - name: tmp
         emptyDir: {}
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-v3
+  labels:
+    app: reviews
+    version: v3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews
+      version: v3
+  template:
+    metadata:
+      labels:
+        app: reviews
+        version: v3
+    spec:
+      serviceAccountName: bookinfo-reviews
+      containers:
+      - name: reviews
+        image: 192.168.219.60/k3s/bookinfo-reviews-v3:1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: "200m"
+          requests:
+            cpu: "150m"
+        env:
+        - name: LOG_DIR
+          value: "/tmp/logs"
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: wlp-output
+          mountPath: /opt/ibm/wlp/output
+        securityContext:
+          runAsUser: 1000
+      volumes:
+      - name: wlp-output
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+---
 ##################################################################################################
 # Productpage services
 ##################################################################################################
@@ -311,6 +358,9 @@ spec:
   - name: v2
     labels:
       version: v2
+  - name: v3
+    labels:
+      version: v3
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
